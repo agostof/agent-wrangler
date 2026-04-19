@@ -44,7 +44,15 @@ RUN usermod -l agent ubuntu \
 
 RUN mkdir -p /work /projects /opt/agent
 COPY docker-entrypoint.sh /opt/agent/docker-entrypoint.sh
-RUN chmod +x /opt/agent/docker-entrypoint.sh
+
+COPY scripts/ /tmp/build-scripts/
+RUN chmod +x /opt/agent/docker-entrypoint.sh \
+ && find /tmp/build-scripts -maxdepth 1 -type f -name '*.sh' -exec chmod +x {} \; \
+ && for f in /tmp/build-scripts/*.sh; do \
+      [ -e "$f" ] || continue; \
+      echo "Running $f"; \
+      bash "$f"; \
+    done
 
 WORKDIR /work
 

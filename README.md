@@ -168,3 +168,31 @@ Inside the container you can:
 * TERM and color settings are configured for modern terminals
 * Designed to work well with tmux and iTerm2
 
+## ⚠️ Security
+
+This container is intended for **local development only**.
+
+It runs with elevated privileges:
+
+* `seccomp:unconfined`
+* `CAP_SYS_ADMIN`
+* support for tools like `bubblewrap`
+
+### Implications
+
+* Reduced container isolation
+* Do **not** run untrusted code
+* Potential increased access to the host system
+
+### Use only for
+
+* Local, single-user environments
+* Trusted workloads
+
+### Do NOT use for
+
+* Production
+* Shared/multi-user systems
+* Untrusted code execution
+
+> If stronger isolation is required, remove elevated privileges or run inside a VM.

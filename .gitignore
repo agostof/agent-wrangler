@@ -1,0 +1,4 @@
+.env
+agent_home/*
+run_container.sh
+workspace/*

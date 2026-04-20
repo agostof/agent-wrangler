@@ -1,0 +1,42 @@
+services:
+  app:
+    build: .
+    stdin_open: true
+    tty: true
+
+    working_dir: /work
+    user: root
+    hostname: sandbox
+    container_name: sandbox-app
+    volumes:
+      - ${WORKSPACE:-./workspace}:/work
+      - ${PROJECTS:-./projects}:/projects
+      - ./agent_home:/home/agent
+      - ./scripts:/scripts
+      - ${CLAUDE_DOT_DIR}:/home/agent/.claude
+      - ${CLAUDE_CONFIG}:/home/agent/.claude.json
+      - ${CLAUDE_STATE_DIR}:/home/agent/.local/state/claude
+      - ${CODEX_DOT_DIR}:/home/agent/.codex
+#      - ${JULES_DOT_DIR:-./.jules}:/home/agent/.jules
+
+    environment:
+      LOCAL_UID: "${CALLER_UID}"
+      LOCAL_GID: "${CALLER_GID}"
+      HOME: /home/agent
+      COLORTERM: truecolor
+      TERM: xterm-256color
+      XDG_CONFIG_HOME: /home/agent/.config
+      XDG_DATA_HOME: /home/agent/.local/share
+      XDG_CACHE_HOME: /home/agent/.cache
+      XDG_STATE_HOME: /home/agent/.local/state
+        #      CLAUDE_DOT_DIR: /home/agent/.claude
+        #      CLAUDE_CONFIG: /home/agent/.claude.json
+        #      CLAUDE_STATE_DIR: /home/agent/.local/state/claude
+        #      CODEX_DOT_DIR: /home/agent/.codex
+
+    security_opt:
+      - seccomp:unconfined
+
+    cap_add:
+      - SYS_ADMIN
+

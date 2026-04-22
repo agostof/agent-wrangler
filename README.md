@@ -4,7 +4,9 @@ A lightweight Docker-based sandbox for running and managing AI agent tooling (e.
 
 ## Overview
 
-`agent-wrangler` provides a consistent development/runtime container with:
+`agent-wrangler` provides a consistent development/runtime container for trying and using multiple agent CLIs without polluting your host environment. It keeps agent binaries/configuration inside a reproducible Docker setup while still granting the permissions some tools need to function (for example `bubblewrap`-based workflows and elevated container capabilities).
+
+It includes:
 
 * isolated workspace and project directories
 * mounted agent configuration (Claude, Codex, etc.)
@@ -159,6 +161,86 @@ Inside the container you can:
 * manage projects in `/work` or `/projects`
 * use tmux for persistent sessions
 * execute deployment scripts or SSH workflows
+
+---
+
+## Headless CLI authentication
+
+For remote terminals and headless sessions, use device-code / no-browser login flows where available.
+
+### Typical commands
+
+```bash
+# Codex (device auth flow)
+codex login --device-auth
+
+# Jules (explicit no-browser flow)
+jules login --no-launch-browser
+```
+
+### Notes by client
+
+* `codex`: use `codex login --device-auth` in headless environments.
+* `jules`: supports `jules login --no-launch-browser` (also echoed by the install script).
+* other clients (Claude, Gemini, OpenCode, OpenClaw): auth flags may vary by version; check:
+
+```bash
+<client> login --help
+```
+
+If your local profile/config is mounted (see `CLAUDE_*` / `CODEX_DOT_DIR` in `.env`), the authenticated session persists across container runs.
+
+---
+
+## Local model backends (WIP)
+
+> 🚧 Work in progress: this section outlines a baseline pattern for connecting agent CLIs to local model servers such as Ollama.
+
+### 1) Start Ollama on the host
+
+Run Ollama locally (outside the container), for example:
+
+```bash
+ollama serve
+```
+
+By default this listens on `http://localhost:11434`.
+
+### 2) Ensure the container can reach the host
+
+From inside Docker, the host is usually reachable as:
+
+* `host.docker.internal` (Docker Desktop/macOS/Windows)
+* Linux may require explicit host-gateway mapping in `docker-compose.yml`
+
+Example Linux-friendly addition:
+
+```yaml
+services:
+  app:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+```
+
+### 3) Point the client to the local model endpoint
+
+Each CLI has different config/env flags, but the common pattern is:
+
+```bash
+export OLLAMA_HOST=http://host.docker.internal:11434
+<client> --help
+<client> config --help
+```
+
+If a CLI supports OpenAI-compatible base URLs instead of `OLLAMA_HOST`, set that client's `BASE_URL`/endpoint config to your local server.
+
+### 4) Quick connectivity check inside the container
+
+```bash
+curl -fsS http://host.docker.internal:11434/api/tags
+```
+
+If this fails, verify Docker host routing and that Ollama is running on the host.
 
 ---
 

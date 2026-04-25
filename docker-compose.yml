@@ -13,6 +13,8 @@ services:
       - ${PROJECTS:-./projects}:/projects
       - ./agent_home:/home/agent
       - ./scripts:/scripts
+      - ./docs:/docs
+      # only needed if the directories are outside of the agent_home dir
       - ${CLAUDE_DOT_DIR}:/home/agent/.claude
       - ${CLAUDE_CONFIG}:/home/agent/.claude.json
       - ${CLAUDE_STATE_DIR}:/home/agent/.local/state/claude
@@ -29,10 +31,6 @@ services:
       XDG_DATA_HOME: /home/agent/.local/share
       XDG_CACHE_HOME: /home/agent/.cache
       XDG_STATE_HOME: /home/agent/.local/state
-        #      CLAUDE_DOT_DIR: /home/agent/.claude
-        #      CLAUDE_CONFIG: /home/agent/.claude.json
-        #      CLAUDE_STATE_DIR: /home/agent/.local/state/claude
-        #      CODEX_DOT_DIR: /home/agent/.codex
 
     security_opt:
       - seccomp:unconfined

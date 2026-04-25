@@ -10,7 +10,7 @@ Analyze a codebase, generate structured documentation according to repository ru
 
 The repository contains a documentation policy file:
 
-Documentation-Rules.md
+documentation-rules.md
 
 This file is the canonical authority for documentation structure and placement.
 

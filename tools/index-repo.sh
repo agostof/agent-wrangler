@@ -22,22 +22,22 @@ echo ""
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "1️⃣  Collecting source files..."
-"$script_dir/index-files.sh" "$OUTPUT_DIR"
+bash "$script_dir/index-files.sh" "$OUTPUT_DIR"
 
 echo "2️⃣  Extracting definitions..."
-"$script_dir/index-definitions.sh" "$OUTPUT_DIR"
+bash "$script_dir/index-definitions.sh" "$OUTPUT_DIR"
 
 echo "3️⃣  Finding exports & imports..."
-"$script_dir/index-imports.sh" "$OUTPUT_DIR"
+bash "$script_dir/index-imports.sh" "$OUTPUT_DIR"
 
 echo "4️⃣  Mapping architecture..."
-"$script_dir/index-architecture.sh" "$OUTPUT_DIR"
+bash "$script_dir/index-architecture.sh" "$OUTPUT_DIR"
 
 echo "5️⃣  Indexing annotations..."
-"$script_dir/index-annotations.sh" "$OUTPUT_DIR"
+bash "$script_dir/index-annotations.sh" "$OUTPUT_DIR"
 
 echo "6️⃣  Generating summaries..."
-"$script_dir/index-summary.sh" "$OUTPUT_DIR"
+bash "$script_dir/index-summary.sh" "$OUTPUT_DIR"
 
 echo ""
 echo "✅ Indexing complete!"

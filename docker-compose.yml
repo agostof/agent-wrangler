@@ -14,6 +14,7 @@ services:
       - ./agent_home:/home/agent
       - ./scripts:/scripts
       - ./docs:/docs
+      - ./tools:/tools
       # only needed if the directories are outside of the agent_home dir
       - ${CLAUDE_DOT_DIR}:/home/agent/.claude
       - ${CLAUDE_CONFIG}:/home/agent/.claude.json

@@ -18,6 +18,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-venv \
     bubblewrap \
     ssh \
+    gh \
+    ripgrep \
  && rm -rf /var/lib/apt/lists/*
 
 # Install nvm globally, outside mounted home

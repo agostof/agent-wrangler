@@ -3,10 +3,12 @@
 # Collect all source files with file type, line count, and organization
 
 OUTPUT_DIR="${1:-.claude}"
+shopt -s expand_aliases
+alias rg='rg --no-messages'
 
-# File type patterns for our languages
 PATTERNS=(
   "*.py"
+  "*.java"
   "*.js"
   "*.jsx"
   "*.ts"
@@ -15,12 +17,11 @@ PATTERNS=(
   "*.bash"
 )
 
-# Generate text format (simple list)
 {
   echo "# Source Files Index"
   echo "Generated: $(date)"
   echo ""
-  
+
   for pattern in "${PATTERNS[@]}"; do
     echo "## $pattern Files"
     rg --files -g "$pattern" --max-count 1000 | sort
@@ -28,12 +29,11 @@ PATTERNS=(
   done
 } > "$OUTPUT_DIR/index/text/files.txt"
 
-# Generate JSON format (structured with metadata)
 {
   echo "{"
   echo '  "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'",'
   echo '  "files_by_type": {'
-  
+
   first=true
   for pattern in "${PATTERNS[@]}"; do
     if [ "$first" = true ]; then
@@ -41,14 +41,14 @@ PATTERNS=(
     else
       echo ","
     fi
-    
+
     echo -n "    \"$pattern\": ["
-    
+
     file_list=()
     while IFS= read -r file; do
       file_list+=("$file")
     done < <(rg --files -g "$pattern" --max-count 1000 | sort)
-    
+
     first_file=true
     for file in "${file_list[@]}"; do
       if [ "$first_file" = true ]; then
@@ -61,13 +61,12 @@ PATTERNS=(
     echo ""
     echo -n "    ]"
   done
-  
+
   echo ""
   echo "  }"
   echo "}"
 } > "$OUTPUT_DIR/index/json/files.json"
 
-# Generate Markdown format (readable summary)
 {
   echo "# Repository File Structure"
   echo ""
@@ -75,11 +74,11 @@ PATTERNS=(
   echo ""
   echo "## File Summary by Type"
   echo ""
-  
+
   for pattern in "${PATTERNS[@]}"; do
     count=$(rg --files -g "$pattern" --max-count 1000 | wc -l)
     lines=$(rg --files -g "$pattern" --max-count 1000 | xargs wc -l 2>/dev/null | tail -1 | awk '{print $1}')
-    
+
     if [ "$count" -gt 0 ]; then
       echo "### $pattern ($count files, ~$lines lines)"
       echo ""
@@ -92,7 +91,7 @@ PATTERNS=(
       echo ""
     fi
   done
-  
+
   echo "## Directory Structure"
   echo ""
   echo "\`\`\`"
@@ -102,6 +101,7 @@ PATTERNS=(
     ! -path '*/.*' \
     ! -path '*/build/*' \
     ! -path '*/dist/*' \
+    ! -path '*/target/*' \
     ! -path '*/__pycache__/*' \
     ! -path '*/.venv/*' \
     ! -path '*/venv/*' \

@@ -3,6 +3,8 @@
 # Extract TODO, FIXME, HACK, and other code annotations
 
 OUTPUT_DIR="${1:-.claude}"
+shopt -s expand_aliases
+alias rg='rg --no-messages'
 
 # Generate text format (quick scan)
 {

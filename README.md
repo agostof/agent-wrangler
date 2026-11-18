@@ -11,8 +11,22 @@ It includes:
 * isolated workspace (`/work`) and project (`/projects`) directories
 * mounted agent configuration (Antigravity, Claude, Codex, Pi, etc.)
 * Node 22 (`nvm`), Python 3, and `uv` (`uv` / `uvx`) preinstalled
+* built-in codebase indexing (`/tools/index-repo.sh`) and multi-agent session backup (`/tools/backup-agent-sessions.py`)
 * interactive terminal support (tmux-friendly)
 * reproducible environment via Docker
+
+## Why `agent-wrangler`?
+
+Even though several modern CLI agents now include their own built-in process sandboxes (`bubblewrap` / Landlock / Seatbelt) for individual tool calls, running them inside `agent-wrangler` solves four practical problems that single-agent sandboxes do not address on their own:
+
+1. **Outer Blast-Radius Control for Autonomous / Unattended Runs**  
+   Built-in agent sandboxes either restrict individual commands or prompt for approval whenever a step needs network or filesystem access. When running long or autonomous workflows where per-command prompts are disabled, `agentsandbox` acts as a hard outer boundary: agents can only see `/work`, `/projects`, and `/home/agent`—never your host SSH keys, browser profiles, cloud credentials (`~/.aws`, `~/.config/gcloud`), or personal directories.
+2. **Zero Host Pollution ("Agent Zoo" Management)**  
+   Trying and updating 10+ fast-moving CLI agents across Node (`npm`), Python (`uv`), and native binaries directly on a host OS quickly clutters global `PATH`s and package caches. `agent-wrangler` keeps every CLI dependency isolated and disposable behind `docker compose build`.
+3. **Vendor-Neutral Context, Skills, and Tooling (`/tools` & `/docs`)**  
+   Instead of locking your repo utilities into a single vendor's dot-folder, `agent-wrangler` mounts shared repository indexers (`/tools/index-repo.sh`), session archivers (`/tools/backup-agent-sessions.py`), and structured workflows (`/docs/skills/`) so you can run or compare different agents (and local Ollama models) against the exact same codebase and tools.
+4. **Seamless Host File Ownership (`LOCAL_UID` / `LOCAL_GID`)**  
+   Standard root containers leave `root:root` build artifacts across host bind mounts. `docker-entrypoint.sh` maps the container's `agent` user to your host `UID:GID` and drops root privileges via `gosu`, so files edited by agents inside the container and files edited in your host IDE always share the same ownership.
 
 ## Files
 
@@ -22,7 +36,8 @@ It includes:
 * `connect_as_agent_user.sh` – helper to open an interactive shell as `agent` inside the running `agentsandbox` container
 * `env.example` – environment variable template
 * `scripts/` – install scripts for agent tooling
-* `tools/` – repository indexing utilities (`/tools/index-repo.sh`)
+* `tools/` – repository indexing utilities (`/tools/index-repo.sh`) and multi-agent session backup (`/tools/backup-agent-sessions.py`)
+* `docs/` – documentation rules, reusable agent skills, and architecture designs (including [docs/shared-mcp-and-model-routing.md](docs/shared-mcp-and-model-routing.md))
 
 ## Getting Started
 
@@ -164,7 +179,7 @@ The container mounts:
 * `/home/agent` → persistent agent home/config (`./agent_home`)
 * `/scripts` → helper scripts (`./scripts`)
 * `/docs` → documentation (`./docs`)
-* `/tools` → indexing scripts (`./tools`)
+* `/tools` → indexing and session backup scripts (`./tools`)
 
 Agent-specific directories (`ANTIGRAVITY_DOT_DIR`, `CLAUDE_*`, `CODEX_DOT_DIR`) can also be mounted from outside `./agent_home` via `.env`.
 
@@ -178,7 +193,7 @@ On startup, `docker-entrypoint.sh` remaps the container's `agent` user and group
 
 ---
 
-## Usage
+## Usage & Built-In Tools
 
 Inside the container you can:
 
@@ -186,6 +201,24 @@ Inside the container you can:
 * use `uv` / `uvx`, `npm` / `npx`, `git`, `gh`, `rg`
 * manage projects in `/work` or `/projects`
 * use tmux for persistent sessions
+
+### Backing Up Agent Sessions (`/tools/backup-agent-sessions.py`)
+
+To archive conversation logs across all installed agents (`agy`, `claude`, `codex`, `pi`/`omp`, `opencode`, `hermes`, `goose`, `gemini`) into a portable folder complete with a self-contained offline HTML viewer (`index.html`) and Markdown transcripts:
+
+```bash
+python3 /tools/backup-agent-sessions.py --out /work/agent-session-backups
+```
+
+### Indexing a Repository (`/tools/index-repo.sh`)
+
+To generate a fast multi-format codebase index (`text/`, `json/`, `markdown/`) for agents and operators:
+
+```bash
+bash /tools/index-repo.sh .claude
+```
+
+See [tools/README-INDEX.md](tools/README-INDEX.md) for details.
 
 ---
 
@@ -218,9 +251,9 @@ If your local profile/config is mounted (see `ANTIGRAVITY_DOT_DIR`, `CLAUDE_*`, 
 
 ---
 
-## Local model backends (WIP)
+## Local model backends & Shared MCP (WIP)
 
-> 🚧 Work in progress: this section outlines a baseline pattern for connecting agent CLIs to local model servers such as Ollama.
+> 🚧 Work in progress: this section outlines a baseline pattern for connecting agent CLIs to local model servers such as Ollama. For the broader design on sharing MCP servers and local model routing across all agents, see [docs/shared-mcp-and-model-routing.md](docs/shared-mcp-and-model-routing.md).
 
 ### 1) Start Ollama on the host
 

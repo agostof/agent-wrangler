@@ -37,7 +37,7 @@ Even though several modern CLI agents now include their own built-in process san
 * `env.example` – environment variable template
 * `scripts/` – install scripts for agent tooling
 * `tools/` – repository indexing utilities (`/tools/index-repo.sh`) and multi-agent session backup (`/tools/backup-agent-sessions.py`)
-* `docs/` – documentation rules, reusable agent skills, and architecture designs (including [docs/shared-mcp-and-model-routing.md](docs/shared-mcp-and-model-routing.md))
+* `docs/` – documentation rules and reusable agent skills
 
 ## Getting Started
 
@@ -251,9 +251,9 @@ If your local profile/config is mounted (see `ANTIGRAVITY_DOT_DIR`, `CLAUDE_*`, 
 
 ---
 
-## Local model backends & Shared MCP (WIP)
+## Local model backends (WIP)
 
-> 🚧 Work in progress: this section outlines a baseline pattern for connecting agent CLIs to local model servers such as Ollama. For the broader design on sharing MCP servers and local model routing across all agents, see [docs/shared-mcp-and-model-routing.md](docs/shared-mcp-and-model-routing.md).
+> 🚧 Work in progress: this section outlines a baseline pattern for connecting agent CLIs to local model servers such as Ollama.
 
 ### 1) Start Ollama on the host
 

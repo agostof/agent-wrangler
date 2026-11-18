@@ -1,4 +1,3 @@
-#!/bin/bash
 # README-INDEX.md
 # Repository Indexing System for LLM Agents
 

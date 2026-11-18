@@ -2,7 +2,7 @@ FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG=C.UTF-8
-ENV PS1="[sandbox] \\u@\\h:\\w\\$ "
+ENV PS1="[agentsandbox] \\u@\\h:\\w\\$ "
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
@@ -22,6 +22,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ripgrep \
  && rm -rf /var/lib/apt/lists/*
 
+# Install uv (uv and uvx) globally
+ENV UV_INSTALL_DIR=/usr/local/bin
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
+ && uv --version
+
 # Install nvm globally, outside mounted home
 ENV NVM_DIR=/usr/local/nvm
 RUN mkdir -p "$NVM_DIR" \
@@ -39,8 +44,8 @@ RUN mkdir -p "$NVM_DIR" \
  && npm -v \
  && npx -v
 
-# uncommet if an upgrade to NPM is needed
-# RUN npm install -g npm@11 promise-retry
+# uncomment if an upgrade to NPM is needed
+# RUN . "$NVM_DIR/nvm.sh" && npm install -g npm@11 promise-retry
 
 # Load nvm for interactive shells
 RUN printf '%s\n' \
@@ -58,7 +63,8 @@ COPY docker-entrypoint.sh /opt/agent/docker-entrypoint.sh
 
 COPY scripts/ /tmp/build-scripts/
 RUN chmod +x /opt/agent/docker-entrypoint.sh \
- && find /tmp/build-scripts -maxdepth 1 -type f -name '*.sh' -exec chmod +x {} \; \
+ && find -L /tmp/build-scripts -maxdepth 1 -type f -name '*.sh' -exec chmod +x {} \; \
+ && . "$NVM_DIR/nvm.sh" \
  && for f in /tmp/build-scripts/*.sh; do \
       [ -e "$f" ] || continue; \
       echo "Running $f"; \
@@ -66,15 +72,13 @@ RUN chmod +x /opt/agent/docker-entrypoint.sh \
     done \
  && rm -rf /tmp/build-scripts && rm -rfv /tmp/*
 
-RUN PREFIX="$(npm config get prefix)" \
- && echo "export PATH=$PREFIX/bin:\$PATH" > /etc/profile.d/npm-global.sh \
- && chmod 644 /etc/profile.d/npm-global.sh
-
-RUN PREFIX="$(npm config get prefix)" \
- && echo "export PATH=$PREFIX/bin:\$PATH" >> /etc/bash.bashrc
+RUN . "$NVM_DIR/nvm.sh" \
+ && PREFIX="$(npm config get prefix)" \
+ && echo "export PATH=$PREFIX/bin:/home/agent/.local/bin:\$PATH" > /etc/profile.d/npm-global.sh \
+ && chmod 644 /etc/profile.d/npm-global.sh \
+ && echo "export PATH=$PREFIX/bin:/home/agent/.local/bin:\$PATH" >> /etc/bash.bashrc
 
 WORKDIR /work
 
 ENTRYPOINT ["/opt/agent/docker-entrypoint.sh"]
 CMD ["bash"]
-

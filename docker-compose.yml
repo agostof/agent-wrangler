@@ -1,3 +1,5 @@
+name: agentsandbox
+
 services:
   app:
     build: .
@@ -6,8 +8,8 @@ services:
 
     working_dir: /work
     user: root
-    hostname: sandbox
-    container_name: sandbox-app
+    hostname: agentsandbox
+    container_name: agentsandbox
     volumes:
       - ${WORKSPACE:-./workspace}:/work
       - ${PROJECTS:-./projects}:/projects
@@ -16,15 +18,17 @@ services:
       - ./docs:/docs
       - ./tools:/tools
       # only needed if the directories are outside of the agent_home dir
-      - ${CLAUDE_DOT_DIR}:/home/agent/.claude
-      - ${CLAUDE_CONFIG}:/home/agent/.claude.json
-      - ${CLAUDE_STATE_DIR}:/home/agent/.local/state/claude
-      - ${CODEX_DOT_DIR}:/home/agent/.codex
-#      - ${JULES_DOT_DIR:-./.jules}:/home/agent/.jules
+      - ${CLAUDE_DOT_DIR:-./agent_home/.claude}:/home/agent/.claude
+      - ${CLAUDE_CONFIG:-./agent_home/.claude.json}:/home/agent/.claude.json
+      - ${CLAUDE_STATE_DIR:-./agent_home/.local/state/claude}:/home/agent/.local/state/claude
+      - ${CODEX_DOT_DIR:-./agent_home/.codex}:/home/agent/.codex
+      - ${ANTIGRAVITY_DOT_DIR:-./agent_home/.gemini/antigravity-cli}:/home/agent/.gemini/antigravity-cli
 
     environment:
-      LOCAL_UID: "${CALLER_UID}"
-      LOCAL_GID: "${CALLER_GID}"
+      LOCAL_UID: "${CALLER_UID:-1000}"
+      LOCAL_GID: "${CALLER_GID:-1000}"
+      CHOWN_AGENT_HOME: "${CHOWN_AGENT_HOME:-false}"
+      CHOWN_WORK: "${CHOWN_WORK:-false}"
       HOME: /home/agent
       COLORTERM: truecolor
       TERM: xterm-256color
@@ -38,4 +42,3 @@ services:
 
     cap_add:
       - SYS_ADMIN
-

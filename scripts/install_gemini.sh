@@ -1,1 +1,0 @@
-available/install_gemini.sh

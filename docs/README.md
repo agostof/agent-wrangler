@@ -1,17 +1,10 @@
-# Skills
+# Documentation
 
-This directory defines reusable agent workflows provided by this system.
+## Audience
 
-A skill is a structured, multi-phase process that can be applied to external codebases.
+This directory serves all audiences (human operators and AI agents) as the canonical reference for `agent-wrangler` documentation conventions and reusable agent workflows.
 
-Skills are:
+## Contents
 
-- executed by agents
-- reusable across repositories
-- operator-gated where specified
-- designed for consistency and auditability
-
-## Available Skills
-
-- codebase-inspection.md — analyze a codebase, generate documentation, and produce a test plan
-
+- [documentation-rules.md](documentation-rules.md) — Canonical rules for organizing `docs/`, `agent-docs/`, and `operator-docs/` across repositories.
+- [skills/README.md](skills/README.md) — Reusable multi-phase agent skills (such as [skills/codebase-inspection.md](skills/codebase-inspection.md)).

@@ -18,7 +18,7 @@ This directory documents the `/tools/index-*.sh` repository indexing system, inc
 
 ## Where To Start
 
-- For system design, capabilities, outputs, and example use cases, start in [docs/README.md](/tools/docs/docs/README.md).
+- For system design, capabilities, outputs, and example use cases, start in [indexing-system.md](indexing-system.md).
 - For agent usage conventions and workflow, start in [agent-docs/README.md](/tools/docs/agent-docs/README.md).
 - For human-executed onboarding and runbook steps, start in [operator-docs/README.md](/tools/docs/operator-docs/README.md).
 

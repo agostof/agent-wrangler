@@ -2,3 +2,6 @@
 agent_home/*
 run_container.sh
 workspace/*
+__pycache__/
+.pytest_cache/
+

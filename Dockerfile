@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gosu \
     python3 \
     python3-pip \
+    python3-pytest \
     python3-venv \
     bubblewrap \
     ssh \

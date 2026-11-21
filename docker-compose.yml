@@ -10,6 +10,10 @@ services:
     user: root
     hostname: agentsandbox
     container_name: agentsandbox
+    # Default "no" keeps the container's lifetime tied to your session.
+    # Set RESTART_POLICY=unless-stopped in .env to keep a `docker compose up -d`
+    # container (and its tmux sessions) running across daemon/host restarts.
+    restart: "${RESTART_POLICY:-no}"
     volumes:
       - ${WORKSPACE:-./workspace}:/work
       - ${PROJECTS:-./projects}:/projects
@@ -17,6 +21,7 @@ services:
       - ./scripts:/scripts
       - ./docs:/docs
       - ./tools:/tools
+      - ./config/tmux.conf:/etc/tmux.conf:ro
       # only needed if the directories are outside of the agent_home dir
       - ${CLAUDE_DOT_DIR:-./agent_home/.claude}:/home/agent/.claude
       - ${CLAUDE_CONFIG:-./agent_home/.claude.json}:/home/agent/.claude.json
@@ -36,6 +41,9 @@ services:
       XDG_DATA_HOME: /home/agent/.local/share
       XDG_CACHE_HOME: /home/agent/.cache
       XDG_STATE_HOME: /home/agent/.local/state
+      # tmux settings, read by config/tmux.conf when the tmux server starts
+      AW_TMUX_PREFIX: "${TMUX_PREFIX:-}"
+      AW_TMUX_RESURRECT: "${TMUX_RESURRECT:-false}"
 
     security_opt:
       - seccomp:unconfined

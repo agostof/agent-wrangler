@@ -34,6 +34,7 @@ def test_jules_removed_and_expected_agents_enabled():
         "install_copilot.sh",
         "install_opencode.sh",
         "install_pi.sh",
+        "install_tmux.sh",
     }
     actual_symlinks = {p.name for p in scripts_dir.iterdir() if p.is_symlink()}
     assert actual_symlinks == expected_enabled
